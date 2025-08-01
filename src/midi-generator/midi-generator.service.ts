@@ -62,12 +62,12 @@ export class MidiGeneratorService {
     await fs.mkdir(outputDir, { recursive: true });
 
     // 2. Process each generator defined in the file
-    for (const generatorConfig of config.generators) {
+    config.generators.forEach((generatorConfig) => {
       if (generatorConfig.type === 'bassline') {
         this.generateBasslineVariations(generatorConfig, config, outputDir);
       }
       // Future 'stabs' generator and others would be called here
-    }
+    });
   }
 
   private generateBasslineVariations(
@@ -88,7 +88,10 @@ export class MidiGeneratorService {
     // Get the base pattern from the config
     const basePattern = generatorConfig.params.pattern;
 
-    for (let i = 1; i <= globalConfig.variations; i++) {
+    Array.from(
+      { length: globalConfig.variations },
+      (_, idx) => idx + 1,
+    ).forEach((i) => {
       // Create a variation of the pattern
       const variedPattern = this.createRhythmicVariation(basePattern);
 
@@ -109,7 +112,7 @@ export class MidiGeneratorService {
       // Write the MIDI file
       // Type assertion to handle the return value of scribble.midi
       scribble.midi(clip, filePath, globalConfig.bpm);
-    }
+    });
   }
 
   /**
@@ -120,16 +123,20 @@ export class MidiGeneratorService {
     const patternChars = pattern.split('');
     const variationChance = 0.25; // 25% chance to alter a step
 
-    for (let i = 0; i < patternChars.length; i++) {
+    const variedPattern = patternChars.reduce((acc, char) => {
       if (Math.random() < variationChance) {
-        // If it's a note, maybe turn it into a rest, or vice versa
-        if (patternChars[i] === 'x') {
-          patternChars[i] = '_';
-        } else if (patternChars[i] === '_') {
-          patternChars[i] = 'x';
+        if (char === 'x') {
+          acc.push('_');
+        } else if (char === '_') {
+          acc.push('x');
+        } else {
+          acc.push(char);
         }
+      } else {
+        acc.push(char);
       }
-    }
-    return patternChars.join('');
+      return acc;
+    }, [] as string[]);
+    return variedPattern.join('');
   }
 }
