@@ -1,0 +1,16 @@
+{
+  "key": "d#",
+  "scale": "minor",
+  "bpm": 126,
+  "variations": 5,
+  "generators": [
+    {
+      "type": "bassline",
+      "fileName": "tech_bass",
+      "params": {
+        "octave": 2,
+        "pattern": "x_x_x___x_x_x___"
+      }
+    }
+  ]
+}
