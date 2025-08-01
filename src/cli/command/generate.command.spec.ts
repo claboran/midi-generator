@@ -105,6 +105,7 @@ describe('GenerateCommand', () => {
       };
 
       // Spy on the protected method directly
+      // @ts-expect-error
       const validateSpy = jest.spyOn(testableCommand, 'validateOptions');
       // Use a more type-safe approach for logger spy
       const loggerSpy = jest.spyOn(testableCommand['logger'], 'log');
