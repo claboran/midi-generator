@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { GenerateCommand } from './generate.command';
 import { GeneratorCommandOptions } from '../generator-command-options.model';
+import { MidiGeneratorService } from '../../midi-generator/midi-generator.service';
 
 /**
  * PATTERN: Type-safe testing of protected/private methods
@@ -28,12 +29,21 @@ describe('GenerateCommand', () => {
   let testableCommand: TestableGenerateCommand;
 
   beforeEach(async () => {
+    // Create a mock for MidiGeneratorService
+    const mockMidiGeneratorService = {
+      processConfigFile: jest.fn().mockResolvedValue(undefined),
+    };
+
     const moduleRef = await Test.createTestingModule({
       providers: [
         GenerateCommand,
         {
           provide: TestableGenerateCommand,
           useClass: TestableGenerateCommand,
+        },
+        {
+          provide: MidiGeneratorService,
+          useValue: mockMidiGeneratorService,
         },
       ],
     }).compile();

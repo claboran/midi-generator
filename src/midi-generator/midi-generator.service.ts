@@ -4,47 +4,12 @@ import * as path from 'path';
 import { ControlFile, GeneratorConfig } from './generator.model';
 import * as scribble from 'scribbletune';
 import { ClipParams } from 'scribbletune';
+import { isControlFile, isGeneratorConfig } from './service-guards';
 
 @Injectable()
 export class MidiGeneratorService {
   private readonly logger = new Logger(MidiGeneratorService.name);
 
-  /**
-   * Type guard to validate if the parsed JSON conforms to the ControlFile type
-   */
-  private isControlFile(obj: unknown): obj is ControlFile {
-    if (!obj || typeof obj !== 'object') return false;
-
-    const candidate = obj as Record<string, unknown>;
-
-    return (
-      typeof candidate.key === 'string' &&
-      typeof candidate.scale === 'string' &&
-      typeof candidate.bpm === 'number' &&
-      typeof candidate.variations === 'number' &&
-      Array.isArray(candidate.generators) &&
-      candidate.generators.every((gen) => this.isGeneratorConfig(gen))
-    );
-  }
-
-  /**
-   * Type guard to validate if an object conforms to the GeneratorConfig type
-   */
-  private isGeneratorConfig(obj: unknown): obj is GeneratorConfig {
-    if (!obj || typeof obj !== 'object') return false;
-
-    const candidate = obj as Record<string, unknown>;
-    const params = candidate.params as Record<string, unknown> | undefined;
-
-    return (
-      (candidate.type === 'bassline' || candidate.type === 'stabs') &&
-      typeof candidate.fileName === 'string' &&
-      params !== undefined &&
-      typeof params === 'object' &&
-      typeof params.octave === 'number' &&
-      typeof params.pattern === 'string'
-    );
-  }
 
   public async processConfigFile(configPath: string, outputDir: string) {
     // 1. Read and parse the JSON control file
@@ -52,7 +17,7 @@ export class MidiGeneratorService {
     const parsedJson = JSON.parse(fileContent) as unknown;
 
     // Validate that the parsed JSON conforms to the ControlFile type
-    if (!this.isControlFile(parsedJson)) {
+    if (!isControlFile(parsedJson)) {
       throw new Error('Invalid control file format');
     }
 
