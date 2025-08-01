@@ -4,12 +4,11 @@ import * as path from 'path';
 import { ControlFile, GeneratorConfig } from './generator.model';
 import * as scribble from 'scribbletune';
 import { ClipParams } from 'scribbletune';
-import { isControlFile, isGeneratorConfig } from './service-guards';
+import { isControlFile } from './service-guards';
 
 @Injectable()
 export class MidiGeneratorService {
   private readonly logger = new Logger(MidiGeneratorService.name);
-
 
   public async processConfigFile(configPath: string, outputDir: string) {
     // 1. Read and parse the JSON control file
@@ -50,6 +49,13 @@ export class MidiGeneratorService {
       `${globalConfig.key}${generatorConfig.params.octave} ${globalConfig.scale}`,
     ) as string[];
 
+    // 2. CREATE THE NOTE PALETTE
+    // Use the noteSelection from the config, or default to just the root note if not provided.
+    const scaleDegrees = generatorConfig.params.noteSelection || [1];
+    const notePalette = scaleDegrees.map((degree) => notes[degree - 1]); // Subtract 1 for 0-based index
+
+    this.logger.log(`Using note palette: [${notePalette.join(', ')}]`);
+
     // Get the base pattern from the config
     const basePattern = generatorConfig.params.pattern;
 
@@ -61,9 +67,9 @@ export class MidiGeneratorService {
       const variedPattern = this.createRhythmicVariation(basePattern);
 
       const clipParams: ClipParams = {
-        notes: [notes[0]], // For this prototype, let's just use the root note
+        notes: notePalette, // Pass the array of selected notes
         pattern: variedPattern,
-        subdiv: '8n', // Default to 8th notes for now
+        subdiv: generatorConfig.params.subdiv ?? '16n',
       };
 
       const clip = scribble.clip(clipParams);

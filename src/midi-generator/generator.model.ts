@@ -4,7 +4,8 @@ export type GeneratorConfig = {
   params: {
     octave: number;
     pattern: string;
-    // We can add more specific params later
+    noteSelection?: number[];
+    subdiv?: string;
   };
 };
 export type ControlFile = {

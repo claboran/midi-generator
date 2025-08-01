@@ -1,15 +1,27 @@
 {
   "key": "d#",
   "scale": "minor",
-  "bpm": 126,
+  "bpm": 128,
   "variations": 5,
   "generators": [
     {
       "type": "bassline",
-      "fileName": "tech_bass",
+      "fileName": "bass_16th",
       "params": {
         "octave": 2,
-        "pattern": "x_x_x___x_x_x___"
+        "pattern": "x_x-x_x_x_x-x___",
+        "noteSelection": [1, 5],
+        "subdiv": "16n"
+      }
+    },
+    {
+      "type": "bassline",
+      "fileName": "bass_8th",
+      "params": {
+        "octave": 2,
+        "pattern": "x_x_x-x_",
+        "noteSelection": [1, 3],
+        "subdiv": "8n"
       }
     }
   ]
